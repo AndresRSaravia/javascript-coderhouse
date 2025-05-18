@@ -1,51 +1,39 @@
-// Inicialización de productos
-let products = [
-	{
-		"id": 1,
-		"title": "Producto 1",
-		"description": "Descripción 1",
-		"price": 20,
-		"stock": 5,
-	},
-	{
-		"id": 2,
-		"title": "Producto 2",
-		"description": "Descripción 2",
-		"price": 1,
-		"stock": 1000,
-	},
-	{
-		"id": 3,
-		"title": "Producto 3",
-		"description": "Descripción 3",
-		"price": 5,
-		"stock": 4,
+// GET de productos
+async function getProducts() {
+	try {
+		let products = []
+		if (localStorage.getItem("products") == null) {
+			const productsRes = await fetch("./db/products.json")
+			products = await productsRes.json()
+			localStorage.setItem("products", JSON.stringify(products))
+		} else {
+			products = JSON.parse(localStorage.getItem("products"))
+		}
+		return products	
+	} catch (error) {
+		console.error(error)
 	}
-]
-if (localStorage.getItem("products") == null) {
-	localStorage.setItem("products", JSON.stringify(products))
-} else {
-	products = JSON.parse(localStorage.getItem("products"))
 }
 
 // Renderizado de productos
-let productContainer = document.getElementById("product-list")
-function renderProducts(products) {
+async function renderProducts() {
+	let productContainer = document.getElementById("product-list")
+	let products = await getProducts()
 	products.forEach(product => {
 		const card = document.createElement("div")
 		card.innerHTML = `<h3>${product.title}</h3>
 							<p>Descripción: ${product.description}</p>
 							<p>Precio: $${product.price}</p>
-							<p>Stock: ${product.stock} unidades</p>
-							<button class="buyProduct1" id="${product.id}">Comprar (1)</button>
-							<button class="buyProduct5" id="${product.id}">Comprar (5)</button>
-							<button class="buyProduct10" id="${product.id}">Comprar (10)</button>`
+							<p class="stockProduct" id="${product.id}">Stock: ${product.stock} unidades</p>
+							<button class="buyProduct1" id="${product.id}">Agregar (1)</button>
+							<button class="buyProduct5" id="${product.id}">Agregar (5)</button>
+							<button class="buyProduct10" id="${product.id}">Agregar (10)</button>`
 		productContainer.appendChild(card)
 	});
 }
-renderProducts(products)
+renderProducts()
 
-// Inicialización de fondos
+// GET de fondos
 let fundsFront = document.getElementById("funds-amount");
 let funds = 0
 if (localStorage.getItem("funds") == null) {
@@ -70,8 +58,51 @@ addFunds100Button.onclick = () => {
 	localStorage.setItem("funds", funds)
 	fundsFront.innerHTML = funds;
 }
-
 let historyButton = document.getElementById("history")
+
+// GET de carrito
+async function getCart() {
+	try {
+		let cart = []
+		if (localStorage.getItem("cart") == null) {
+			localStorage.setItem("cart", JSON.stringify(cart))
+		} else {
+			cart = JSON.parse(localStorage.getItem("cart"))
+		}
+		//console.log(cart)
+		return cart	
+	} catch (error) {
+		console.error(error)
+	}
+}
+
+// Función de agregar al carrito
+function addToCart(className,quantity) {
+	let cart = getCart()
+	buyButtom = document.querySelectorAll(className)
+	buyButtom.forEach(buttom => {
+		console.log(222)
+		buttom.onclick = (e) => {
+			const productId = e.currentTarget.id
+			console.log(productId,className,quantity)
+			const foundProduct = products.find(product => product.id == productId)
+			if (funds>=foundProduct.price*quantity && foundProduct.stock>=quantity){
+				cartItem = {
+					"id": productId,
+					"quantity": quantity
+				}
+				cart.push(purchase)
+				localStorage.setItem("cart", JSON.stringify(cart))
+				e.currentTarget.innerHTML = "Agregado"
+			} else {
+				e.currentTarget.innerHTML = "Error"
+			}
+		}
+	});
+}
+addToCart(".addProduct1",1)
+addToCart(".addProduct5",5)
+addToCart(".addProduct10",10)
 
 // Inicialización de historial de compra
 let purchaseHistory = []
