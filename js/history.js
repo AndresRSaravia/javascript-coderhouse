@@ -59,3 +59,40 @@ renderLogs(purchaseHistory)
 purchaseHistory.forEach(purchase => {
 	console.log(purchase.product.id)
 })
+
+
+// Función de agregar una compra
+async function addToPurchaseHistory(className,quantity) {
+	let products = await getProducts()
+	buyButtom = document.querySelectorAll(className)
+	buyButtom.forEach(buttom => {
+		buttom.onclick = (e) => {
+			const productId = e.currentTarget.id
+			console.log(productId,className,quantity)
+			const foundProduct = products.find(product => product.id == productId)
+			if (funds>=foundProduct.price*quantity && foundProduct.stock>=quantity){
+				funds -= foundProduct.price*quantity
+				localStorage.setItem("funds", funds)
+				fundsFront.innerHTML = funds
+				let productIndex = products.indexOf(foundProduct)
+				foundProduct.stock -= quantity
+				products[productIndex] = foundProduct
+				localStorage.setItem("products", JSON.stringify(products))
+				products.splice()
+				const purchase = {
+					"date": Date(),
+					"quantity": quantity,
+					"product": foundProduct
+				}
+				purchaseHistory.push(purchase)
+				localStorage.setItem("purchaseHistory", JSON.stringify(purchaseHistory))
+				e.currentTarget.innerHTML = "Comprado"
+			} else {
+				e.currentTarget.innerHTML = "Error"
+			}
+		}
+	});
+}
+addToPurchaseHistory(".buyProduct1",1)
+addToPurchaseHistory(".buyProduct5",5)
+addToPurchaseHistory(".buyProduct10",10)
