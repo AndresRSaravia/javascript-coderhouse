@@ -9,7 +9,7 @@ async function getProducts() {
 		} else {
 			products = JSON.parse(localStorage.getItem("products"))
 		}
-		return products	
+		return products
 	} catch (error) {
 		console.error(error)
 	}
@@ -34,43 +34,42 @@ async function renderProducts() {
 renderProducts()
 
 // GET de fondos
-let fundsFront = document.getElementById("funds-amount");
-let funds = 0
-if (localStorage.getItem("funds") == null) {
-	localStorage.setItem("funds", funds)
-} else {
-	funds = Number(localStorage.getItem("funds"))
-	fundsFront.innerHTML = funds;
+function getFunds() {
+	let funds = 0
+	if (localStorage.getItem("funds") == null) {
+		localStorage.setItem("funds", funds)
+	} else {
+		funds = Number(localStorage.getItem("funds"))
+	}
+	return funds
 }
 
 // Renderizado de fondos
-let addFunds10Button = document.getElementById("add-funds10")
-let addFunds100Button = document.getElementById("add-funds100")
-addFunds10Button.onclick = () => {
-	funds = Number(localStorage.getItem("funds"))
-	funds+=10;
-	localStorage.setItem("funds", funds)
+async function renderFunds(id,quantity) {
+	funds = getFunds()
+	let fundsFront = document.getElementById("funds-amount");
 	fundsFront.innerHTML = funds;
+	let addFundsButton = document.getElementById(id)
+	addFundsButton.onclick = () => {
+		funds = getFunds()
+		funds += quantity;
+		localStorage.setItem("funds", funds)
+		fundsFront.innerHTML = funds;
+	}
 }
-addFunds100Button.onclick = () => {
-	funds = Number(localStorage.getItem("funds"))
-	funds+=100;
-	localStorage.setItem("funds", funds)
-	fundsFront.innerHTML = funds;
-}
-let historyButton = document.getElementById("history")
+renderFunds("add-funds10",10)
+renderFunds("add-funds100",100)
 
 // GET de carrito
 async function getCart() {
 	try {
-		let cart = []
+		let cart = {}
 		if (localStorage.getItem("cart") == null) {
 			localStorage.setItem("cart", JSON.stringify(cart))
 		} else {
 			cart = JSON.parse(localStorage.getItem("cart"))
 		}
-		//console.log(cart)
-		return cart	
+		return cart
 	} catch (error) {
 		console.error(error)
 	}
@@ -78,21 +77,24 @@ async function getCart() {
 
 // Función de agregar al carrito
 async function addToCart(className,quantity) {
-	let cart = await getCart()
-	let products = await getProducts()
-	buyButtom = document.querySelectorAll(className)
-	buyButtom.forEach(buttom => {
-		buttom.onclick = (e) => {
+	const products = await getProducts()
+	addButtom = document.querySelectorAll(className)
+	addButtom.forEach(buttom => {
+		buttom.onclick = async (e) => {
+			let cart = await getCart()
 			const productId = e.currentTarget.id
-			console.log(productId,className,quantity)
 			const foundProduct = products.find(product => product.id == productId)
-			cartItem = {
-				"id": productId,
-				"quantity": quantity
+			if (foundProduct) {
+				if (cart[productId]) {
+					cart[productId] += quantity
+				} else {
+					cart[productId] = quantity
+				}
+				localStorage.setItem("cart", JSON.stringify(cart))
+				e.currentTarget.innerHTML = "Agregado"
+			} else {
+				e.currentTarget.innerHTML = "Error"
 			}
-			cart.push(cartItem)
-			localStorage.setItem("cart", JSON.stringify(cart))
-			e.currentTarget.innerHTML = "Agregado"
 		}
 	});
 }
