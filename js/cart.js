@@ -3,7 +3,7 @@ async function getProducts() {
 	try {
 		let products = []
 		if (localStorage.getItem("products") == null) {
-			const productsRes = await fetch("./db/products.json")
+			const productsRes = await fetch("../db/products.json")
 			products = await productsRes.json()
 			localStorage.setItem("products", JSON.stringify(products))
 		} else {
@@ -65,14 +65,23 @@ async function renderCart(){
 		const foundProduct = products.find(product => product.id == productId)
 		if (foundProduct){
 			const cartItem = document.createElement("div")
-			cartItem.innerHTML = `<h3>Producto: ${foundProduct.title} (Id: ${foundProduct.id})</h3>
-								<p>Descripción: ${foundProduct.description}</p>
-								<p>Precio: $${foundProduct.price}</p>
-								<p>Cantidad a comprar: ${cart[productId]} de ${foundProduct.stock} unidades disponibles</p>
-								<p>Dinero invertido: ${cart[productId]*foundProduct.price}</p>`
+			cartItem.innerHTML = `<div class="card">
+									<div class="container">
+										<h3><b>${foundProduct.title} (Id: ${foundProduct.id})</b></h3>
+										<p>Descripción: ${foundProduct.description}</p>
+										<p>Precio: $${foundProduct.price}</p>
+										<p>Cantidad: ${cart[productId]} de ${foundProduct.stock} disponibles</p>
+										<p>Costo: ${cart[productId]*foundProduct.price}</p>
+									</div>
+								</div>`
 			cartContainer.appendChild(cartItem)
 		} else {
-			cartItem.innerHTML = `<h3>Id no encontrada: ${productId}</h3>`
+			cartItem.innerHTML = `<div class="card">
+									<div class="container">
+										<h3><b>Id no encontrada: ${productId}</b></h3>
+									</div>
+								</div>`
+
 			cartContainer.appendChild(cartItem)
 		}
 	})
@@ -83,7 +92,7 @@ renderCart()
 function getTickets() {
 	let tickets = []
 	if (localStorage.getItem("tickets") == null) {
-		localStorage.setItem("tickets", tickets)
+		localStorage.setItem("tickets", JSON.stringify(tickets))
 	} else {
 		tickets = JSON.parse(localStorage.getItem("tickets"))
 	}
@@ -119,12 +128,16 @@ async function buyCart() {
 				localStorage.setItem("cart", JSON.stringify(cart))
 			}
 		})
+		console.log(JSON.stringify(ticket.boughtProducts) != "{}")
 		if (JSON.stringify(ticket.boughtProducts) != "{}") {
 			let tickets = getTickets()
 			tickets.push(ticket)
 			localStorage.setItem("tickets", JSON.stringify(tickets))
 			e.currentTarget.innerHTML = "Comprado"
+		} else {
+			e.currentTarget.innerHTML = "Error"
 		}
+		window.location.reload()
 	};
 }
 buyCart()

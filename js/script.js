@@ -14,20 +14,24 @@ async function getProducts() {
 		console.error(error)
 	}
 }
-
 // Renderizado de productos
 async function renderProducts() {
 	let productContainer = document.getElementById("product-list")
 	let products = await getProducts()
 	products.forEach(product => {
 		const card = document.createElement("div")
-		card.innerHTML = `<h3>${product.title}</h3>
-							<p>Descripción: ${product.description}</p>
-							<p>Precio: $${product.price}</p>
-							<p class="stockProduct" id="${product.id}">Stock: ${product.stock} unidades</p>
-							<button class="addProduct1" id="${product.id}">Agregar (1)</button>
-							<button class="addProduct5" id="${product.id}">Agregar (5)</button>
-							<button class="addProduct10" id="${product.id}">Agregar (10)</button>`
+		card.innerHTML = `<div class="card">
+									<div class="container">
+										<h3><b>${product.title} (Id: ${product.id})</b></h3>
+										<p>Descripción: ${product.description}</p>
+										<p>Precio: $${product.price}</p>
+										<p class="stockProduct" id="${product.id}">Stock: ${product.stock} unidades</p>
+										<button class="addProduct1" id="${product.id}">Agregar (1)</button>
+										<button class="addProduct5" id="${product.id}">Agregar (5)</button>
+										<button class="addProduct10" id="${product.id}">Agregar (10)</button>
+									</div>
+								</div>`
+
 		productContainer.appendChild(card)
 	});
 }
