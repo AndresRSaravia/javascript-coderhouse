@@ -240,7 +240,7 @@ async function buyCart() {
 		} else {
 			Swal.fire({
 				title: "¡Compra no realizada!",
-				text: "El carrito está vacío",
+				text: "El carrito está vacío o no tienes suficientes fondos.",
 				icon: "error"
 			})
 		}
