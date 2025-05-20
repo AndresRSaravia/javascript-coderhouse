@@ -103,7 +103,6 @@ async function modifyCart(className,quantity) {
 	let addButtom = ''
 	setTimeout(() => {
 		addButtom = document.querySelectorAll(className)
-		//console.log(document.querySelectorAll(className))
 		addButtom.forEach(buttom => {
 			buttom.onclick = async (e) => {
 				let cart = await getCart()
@@ -111,7 +110,6 @@ async function modifyCart(className,quantity) {
 				const foundProduct = products.find(product => product.id == productId)
 				if (foundProduct) {
 					let quantityFront = document.querySelectorAll(`.quantity${productId}`)
-					console.log(quantityFront)
 					if ((!(quantity<0) || cart[productId]>0) && foundProduct.stock>=(cart[productId]+quantity)) {
 						cart[productId] += quantity
 						quantityFront.innerHTML = cart[productId]
@@ -139,7 +137,6 @@ async function removeFromCart(className) {
 	let addButtom = ''
 	setTimeout(() => {
 		addButtom = document.querySelectorAll(className)
-		//console.log(document.querySelectorAll(className))
 		addButtom.forEach(buttom => {
 			buttom.onclick = async (e) => {
 				let cart = await getCart()
@@ -188,7 +185,7 @@ async function buyCart() {
 	buyButtom = document.getElementById("buy-cart")
 	buyButtom.onclick = async (e) => {
 		const { value: formValues } = await Swal.fire({
-			title: "Enter email and card number",
+			title: "Para completar la compra, ingrese su email y datos bancarios",
 			html: `<input id="swal-input1" class="swal2-input">
 					<input id="swal-input2" class="swal2-input">`,
 			focusConfirm: false,
@@ -229,7 +226,6 @@ async function buyCart() {
 				productTitles.push(foundProduct.title)
 			}
 		})
-		console.log(JSON.stringify(ticket.boughtProducts) != "{}")
 		if (JSON.stringify(ticket.boughtProducts) != "{}") {
 			let tickets = getTickets()
 			tickets.push(ticket)

@@ -87,7 +87,6 @@ async function getCart() {
 async function addToCart(className,quantity) {
 	const products = await getProducts()
 	let addButtom = document.querySelectorAll(className)
-	console.log(document.querySelectorAll(className))
 	addButtom.forEach(buttom => {
 		buttom.onclick = async (e) => {
 			let cart = await getCart()
