@@ -31,7 +31,6 @@ async function renderProducts() {
 										<button class="addProduct10" id="${product.id}">Agregar (10)</button>
 									</div>
 								</div>`
-
 		productContainer.appendChild(card)
 	});
 }
@@ -82,7 +81,8 @@ async function getCart() {
 // Función de agregar al carrito
 async function addToCart(className,quantity) {
 	const products = await getProducts()
-	addButtom = document.querySelectorAll(className)
+	let addButtom = document.querySelectorAll(className)
+	console.log(document.querySelectorAll(className))
 	addButtom.forEach(buttom => {
 		buttom.onclick = async (e) => {
 			let cart = await getCart()

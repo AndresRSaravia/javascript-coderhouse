@@ -57,6 +57,7 @@ async function getCart() {
 	}
 }
 
+// Renderizado de carrito
 async function renderCart(){
 	let cartContainer = document.getElementById("cart-list")
 	let cart = await getCart()
@@ -67,11 +68,14 @@ async function renderCart(){
 			const cartItem = document.createElement("div")
 			cartItem.innerHTML = `<div class="card">
 									<div class="container">
-										<h3><b>${foundProduct.title} (Id: ${foundProduct.id})</b></h3>
+										<h3><b>${foundProduct.title} (Id: ${productId})</b></h3>
 										<p>Descripción: ${foundProduct.description}</p>
 										<p>Precio: $${foundProduct.price}</p>
-										<p>Cantidad: ${cart[productId]} de ${foundProduct.stock} disponibles</p>
+										<p class="quantity${productId}">Cantidad: ${cart[productId]} de ${foundProduct.stock} disponibles</p>
 										<p>Costo: ${cart[productId]*foundProduct.price}</p>
+										<button class="add1Product" id="${productId}">(+)</button>
+										<button class="sub1Product" id="${productId}">(-)</button>
+										<button class="removeProduct" id="${productId}">Eliminar</button>
 									</div>
 								</div>`
 			cartContainer.appendChild(cartItem)
@@ -87,6 +91,72 @@ async function renderCart(){
 	})
 }
 renderCart()
+
+// Función de modificar el carrito
+async function modifyCart(className,quantity) {
+	const products = await getProducts()
+	let addButtom = ''
+	setTimeout(() => {
+		addButtom = document.querySelectorAll(className);
+		//console.log(document.querySelectorAll(className))
+		addButtom.forEach(buttom => {
+			buttom.onclick = async (e) => {
+				let cart = await getCart()
+				const productId = e.currentTarget.id
+				const foundProduct = products.find(product => product.id == productId)
+				if (foundProduct) {
+					let quantityFront = document.querySelectorAll(`.quantity${productId}`)
+					console.log(quantityFront)
+					if (!(quantity<0) || cart[productId]>0) {
+						cart[productId] += quantity
+						quantityFront.innerHTML = cart[productId]
+					} else {
+						e.currentTarget.innerHTML = "Error"
+					}
+					localStorage.setItem("cart", JSON.stringify(cart))
+				} else {
+					e.currentTarget.innerHTML = "Error"
+				}
+				window.location.reload() // los innerHTML no se están actualizando :/
+			}
+		});
+	}, "500");
+
+}
+modifyCart(".add1Product",+1)
+modifyCart(".sub1Product",-1)
+
+// Función de remover del carrito
+async function removeFromCart(className) {
+	const products = await getProducts()
+	let addButtom = ''
+	setTimeout(() => {
+		addButtom = document.querySelectorAll(className);
+		//console.log(document.querySelectorAll(className))
+		addButtom.forEach(buttom => {
+			buttom.onclick = async (e) => {
+				let cart = await getCart()
+				const productId = e.currentTarget.id
+				delete cart[productId]
+				localStorage.setItem("cart", JSON.stringify(cart))
+				window.location.reload() // los innerHTML no se están actualizando :/
+			}
+		});
+	}, "500");
+
+}
+removeFromCart(".removeProduct")
+
+// Función de vaciar el carrito
+async function emptyCart() {
+	let emptyButtom = document.getElementById("empty-cart");
+	emptyButtom.onclick = async (e) => {
+		const cart = {}
+		localStorage.setItem("cart", JSON.stringify(cart))
+		window.location.reload() // los innerHTML no se están actualizando :/
+	}
+}
+emptyCart()
 
 // GET de tickets
 function getTickets() {
