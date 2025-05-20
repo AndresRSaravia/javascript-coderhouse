@@ -185,14 +185,16 @@ async function buyCart() {
 	buyButtom = document.getElementById("buy-cart")
 	buyButtom.onclick = async (e) => {
 		const { value: formValues } = await Swal.fire({
-			title: "Para completar la compra, ingrese su email y datos bancarios",
-			html: `<input id="swal-input1" class="swal2-input">
-					<input id="swal-input2" class="swal2-input">`,
+			title: "Para completar la compra, ingrese su email, contraseña y datos bancarios",
+			html: `<input id="swal-input1" class="swal2-input" type="email" placeholder="Email">
+					<input id="swal-input2" class="swal2-input" type="password" placeholder="Contraseña">
+					<input id="swal-input3" class="swal2-input" placeholder="Datos bancarios">`,
 			focusConfirm: false,
 			preConfirm: () => {
 				return [
 				document.getElementById("swal-input1").value,
-				document.getElementById("swal-input2").value
+				document.getElementById("swal-input2").value,
+				document.getElementById("swal-input3").value
 				]
 			}
 		})
@@ -231,12 +233,16 @@ async function buyCart() {
 			tickets.push(ticket)
 			localStorage.setItem("tickets", JSON.stringify(tickets))
 			Swal.fire({
-				title: `¡Compra realizada!`,
+				title: "¡Compra realizada!",
 				text: `Se han comprado los productos ${productTitles.join(", ")}`,
 				icon: "success"
 			})
 		} else {
-			e.currentTarget.innerHTML = "Error"
+			Swal.fire({
+				title: "¡Compra no realizada!",
+				text: "El carrito está vacío",
+				icon: "error"
+			})
 		}
 		setTimeout(() => {
 			window.location.reload()
