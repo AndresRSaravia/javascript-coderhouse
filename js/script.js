@@ -32,7 +32,7 @@ async function renderProducts() {
 									</div>
 								</div>`
 		productContainer.appendChild(card)
-	});
+	})
 }
 renderProducts()
 
@@ -50,14 +50,19 @@ function getFunds() {
 // Renderizado de fondos
 async function renderFunds(id,quantity) {
 	funds = getFunds()
-	let fundsFront = document.getElementById("funds-amount");
-	fundsFront.innerHTML = funds;
+	let fundsFront = document.getElementById("funds-amount")
+	fundsFront.innerHTML = funds
 	let addFundsButton = document.getElementById(id)
 	addFundsButton.onclick = () => {
 		funds = getFunds()
-		funds += quantity;
+		funds += quantity
 		localStorage.setItem("funds", funds)
-		fundsFront.innerHTML = funds;
+		fundsFront.innerHTML = funds
+		Swal.fire({
+			title: "Transacción completada",
+			text: `Has agregado $${quantity} a tu cuenta. Total: $${funds}`,
+			icon: "success"
+		})
 	}
 }
 renderFunds("add-funds10",10)
@@ -88,19 +93,31 @@ async function addToCart(className,quantity) {
 			let cart = await getCart()
 			const productId = e.currentTarget.id
 			const foundProduct = products.find(product => product.id == productId)
-			if (foundProduct) {
-				if (cart[productId]) {
-					cart[productId] += quantity
-				} else {
-					cart[productId] = quantity
-				}
+			if (foundProduct && cart[productId] && foundProduct.stock>=(quantity+cart[productId])) {
+				cart[productId] += quantity
 				localStorage.setItem("cart", JSON.stringify(cart))
-				e.currentTarget.innerHTML = "Agregado"
+				Swal.fire({
+					title: `¡${foundProduct.title} agregado!`,
+					text: `Se han agregado ${quantity} unidades`,
+					icon: "success"
+				})
+			} else if (foundProduct && !cart[productId] && foundProduct.stock>=quantity) {
+				cart[productId] = quantity
+				localStorage.setItem("cart", JSON.stringify(cart))
+				Swal.fire({
+					title: `¡${foundProduct.title} agregado!`,
+					text: `Se han agregado ${quantity} unidades`,
+					icon: "success"
+				})
 			} else {
-				e.currentTarget.innerHTML = "Error"
+				Swal.fire({
+					title: "¡No se pudo agregar el producto!",
+					text: "El producto no existe o no hay suficientes unidades",
+					icon: "error"
+				})
 			}
 		}
-	});
+	})
 }
 addToCart(".addProduct1",1)
 addToCart(".addProduct5",5)

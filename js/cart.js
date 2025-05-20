@@ -29,14 +29,19 @@ function getFunds() {
 // Renderizado de fondos
 async function renderFunds(id,quantity) {
 	funds = getFunds()
-	let fundsFront = document.getElementById("funds-amount");
-	fundsFront.innerHTML = funds;
+	let fundsFront = document.getElementById("funds-amount")
+	fundsFront.innerHTML = funds
 	let addFundsButton = document.getElementById(id)
 	addFundsButton.onclick = () => {
 		funds = getFunds()
-		funds += quantity;
+		funds += quantity
 		localStorage.setItem("funds", funds)
-		fundsFront.innerHTML = funds;
+		fundsFront.innerHTML = funds
+		Swal.fire({
+			title: "Transacción completada",
+			text: `Has agregado $${quantity} a tu cuenta. Total: $${funds}`,
+			icon: "success"
+		})
 	}
 }
 renderFunds("add-funds10",10)
@@ -97,7 +102,7 @@ async function modifyCart(className,quantity) {
 	const products = await getProducts()
 	let addButtom = ''
 	setTimeout(() => {
-		addButtom = document.querySelectorAll(className);
+		addButtom = document.querySelectorAll(className)
 		//console.log(document.querySelectorAll(className))
 		addButtom.forEach(buttom => {
 			buttom.onclick = async (e) => {
@@ -107,11 +112,14 @@ async function modifyCart(className,quantity) {
 				if (foundProduct) {
 					let quantityFront = document.querySelectorAll(`.quantity${productId}`)
 					console.log(quantityFront)
-					if (!(quantity<0) || cart[productId]>0) {
+					if ((!(quantity<0) || cart[productId]>0) && foundProduct.stock>=(cart[productId]+quantity)) {
 						cart[productId] += quantity
 						quantityFront.innerHTML = cart[productId]
 					} else {
 						e.currentTarget.innerHTML = "Error"
+					}
+					if (cart[productId] == 0) {
+						delete cart[productId]
 					}
 					localStorage.setItem("cart", JSON.stringify(cart))
 				} else {
@@ -119,8 +127,8 @@ async function modifyCart(className,quantity) {
 				}
 				window.location.reload() // los innerHTML no se están actualizando :/
 			}
-		});
-	}, "500");
+		})
+	}, "500")
 
 }
 modifyCart(".add1Product",+1)
@@ -128,10 +136,9 @@ modifyCart(".sub1Product",-1)
 
 // Función de remover del carrito
 async function removeFromCart(className) {
-	const products = await getProducts()
 	let addButtom = ''
 	setTimeout(() => {
-		addButtom = document.querySelectorAll(className);
+		addButtom = document.querySelectorAll(className)
 		//console.log(document.querySelectorAll(className))
 		addButtom.forEach(buttom => {
 			buttom.onclick = async (e) => {
@@ -141,19 +148,26 @@ async function removeFromCart(className) {
 				localStorage.setItem("cart", JSON.stringify(cart))
 				window.location.reload() // los innerHTML no se están actualizando :/
 			}
-		});
-	}, "500");
+		})
+	}, "500")
 
 }
 removeFromCart(".removeProduct")
 
 // Función de vaciar el carrito
 async function emptyCart() {
-	let emptyButtom = document.getElementById("empty-cart");
+	let emptyButtom = document.getElementById("empty-cart")
 	emptyButtom.onclick = async (e) => {
 		const cart = {}
 		localStorage.setItem("cart", JSON.stringify(cart))
-		window.location.reload() // los innerHTML no se están actualizando :/
+		Swal.fire({
+			title: "¡Carrito vaciado!",
+			text: "Se han quitado todos los productos",
+			icon: "success"
+		})
+		setTimeout(() => {
+			window.location.reload() // los innerHTML no se están actualizando :/
+		}, 1000)
 	}
 }
 emptyCart()
@@ -173,6 +187,21 @@ function getTickets() {
 async function buyCart() {
 	buyButtom = document.getElementById("buy-cart")
 	buyButtom.onclick = async (e) => {
+		const { value: formValues } = await Swal.fire({
+			title: "Enter email and card number",
+			html: `<input id="swal-input1" class="swal2-input">
+					<input id="swal-input2" class="swal2-input">`,
+			focusConfirm: false,
+			preConfirm: () => {
+				return [
+				document.getElementById("swal-input1").value,
+				document.getElementById("swal-input2").value
+				]
+			}
+		})
+		if (formValues) {
+			Swal.fire(JSON.stringify(formValues))
+		}
 		let cart = await getCart()
 		let products = await getProducts()
 		let funds = getFunds()
@@ -180,6 +209,7 @@ async function buyCart() {
 			"date": Date(),
 			"boughtProducts": {}
 		}
+		productTitles = []
 		Object.keys(cart).forEach(productId => {
 			const foundProduct = products.find(product => product.id == productId)
 			if (funds>=foundProduct.price*cart[productId] && foundProduct.stock>=cart[productId]){
@@ -196,6 +226,7 @@ async function buyCart() {
 				// actualización de carrito
 				delete cart[productId]
 				localStorage.setItem("cart", JSON.stringify(cart))
+				productTitles.push(foundProduct.title)
 			}
 		})
 		console.log(JSON.stringify(ticket.boughtProducts) != "{}")
@@ -203,11 +234,23 @@ async function buyCart() {
 			let tickets = getTickets()
 			tickets.push(ticket)
 			localStorage.setItem("tickets", JSON.stringify(tickets))
-			e.currentTarget.innerHTML = "Comprado"
+			Swal.fire({
+				title: `¡Compra realizada!`,
+				text: `Se han comprado los productos ${productTitles.join(", ")}`,
+				icon: "success"
+			})
 		} else {
 			e.currentTarget.innerHTML = "Error"
 		}
-		window.location.reload()
-	};
+		setTimeout(() => {
+			window.location.reload()
+		}, 1000);
+	}
 }
 buyCart()
+
+
+async function fooo2() {
+
+}
+//fooo2()
