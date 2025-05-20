@@ -44,7 +44,6 @@ async function renderTickets(){
 			const foundProduct = products.find(product => product.id == productId)
 			if (foundProduct){
 				const productItem = document.createElement("div")
-
 				productItem.innerHTML += `<div class="card">
 											<div class="container">
 												<h3>Producto: ${foundProduct.title} (Id: ${foundProduct.id})</h3>
@@ -64,3 +63,25 @@ async function renderTickets(){
 	})
 }
 renderTickets()
+
+async function fooo2() {
+	const { value: formValues } = await Swal.fire({
+	title: "Enter email and card number",
+	html: `
+		<input id="swal-input1" class="swal2-input">
+		<input id="swal-input2" class="swal2-input">
+	`,
+	focusConfirm: false,
+	preConfirm: () => {
+		return [
+		document.getElementById("swal-input1").value,
+		document.getElementById("swal-input2").value
+		];
+	}
+	});
+	if (formValues) {
+	Swal.fire(JSON.stringify(formValues));
+	}
+}
+fooo2()
+
